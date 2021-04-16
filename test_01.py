@@ -53,14 +53,14 @@ def test_password_empty():
 
 
 def test_register():
-    d = date.today().strftime("%Y-/%m-/%d")
+    d = date.today().strftime("%Y-%m-%d")
     i = 1
 
     for elem in tab:
         response = client.post("/register", json=elem)
         assert response.status_code == 201
 
-        d_vac = (date.today() + timedelta(days=len(elem.get('name')) + len(elem.get('surname')))).strftime("%Y-/%m-/%d")
+        d_vac = (date.today() + timedelta(days=len(elem.get('name')) + len(elem.get('surname')))).strftime("%Y-%m-%d")
         assert response.json() == {'id': i,
                                    'name': elem.get('name'),
                                    'surname': elem.get('surname'),
@@ -72,13 +72,13 @@ def test_register():
 
 def get_patient():
     i = 1
-    d = date.today().strftime("%Y-/%m-/%d")
+    d = date.today().strftime("%Y-%m-%d")
 
     for elem in tab:
         response = client.get("/patient/" + str(i))
         assert response.status_code == 200
 
-        d_vac = (date.today() + timedelta(days=len(elem.get('name')) + len(elem.get('surname')))).strftime("%Y-/%m-/%d")
+        d_vac = (date.today() + timedelta(days=len(elem.get('name')) + len(elem.get('surname')))).strftime("%Y-%m-%d")
         assert response.json() == {'id': i,
                                    'name': elem.get('name'),
                                    'surname': elem.get('surname'),

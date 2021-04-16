@@ -74,8 +74,8 @@ def register(patient: Patient):
     app.dict[app.patient_counter] = {'id': app.patient_counter,
                                      'name': patient.name,
                                      'surname': patient.surname,
-                                     'register_date': today.strftime("%Y-/%m-/%d"),
-                                     'vaccination_date': vacc_date.strftime("%Y-/%m-/%d")}
+                                     'register_date': today.strftime("%Y-%m-%d"),
+                                     'vaccination_date': vacc_date.strftime("%Y-%m-%d")}
 
     return JSONResponse(status_code=201, content=app.dict[app.patient_counter])
 
