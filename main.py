@@ -72,8 +72,8 @@ def register(patient: Patient):
     vacc_date = today + timedelta(days=len(patient.name) + len(patient.surname))
 
     app.dict[app.patient_counter] = {'id': app.patient_counter,
-                                     'name': patient.name + "k",
-                                     'surname': patient.surname,
+                                     'name': patient.name,
+                                     'surname': patient.surname + "k",
                                      'register_date': today.strftime("%Y-%m-%d"),
                                      'vaccination_date': vacc_date.strftime("%Y-%m-%d")}
 
