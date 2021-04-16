@@ -57,7 +57,7 @@ def method():
 
 
 # ZADANIE 3
-@app.get("/auth")
+@app.get("/auth", status_code=401)
 def auth(password: str, password_hash: str):
     if encrypt_string(password) == password_hash:
         return Response(status_code=204)
@@ -97,5 +97,6 @@ def patient(id: int):
     else:
         return JSONResponse(status_code=200, content=app.dict[id])
 
-# if __name__ == "__main__":
-#    uvicorn.run("main:app")
+
+if __name__ == "__main__":
+    uvicorn.run("main:app")
