@@ -61,7 +61,7 @@ def test_register():
         assert response.status_code == 201
 
         d_vac = (date.today() + timedelta(days=len(elem.get('name')) + len(elem.get('surname')))).strftime("%Y-/%m-/%d")
-        assert response.json() == {'id': str(i),
+        assert response.json() == {'id': i,
                                    'name': elem.get('name'),
                                    'surname': elem.get('surname'),
                                    'register_date': d,
@@ -79,7 +79,7 @@ def get_patient():
         assert response.status_code == 200
 
         d_vac = (date.today() + timedelta(days=len(elem.get('name')) + len(elem.get('surname')))).strftime("%Y-/%m-/%d")
-        assert response.json() == {'id': str(i),
+        assert response.json() == {'id': i,
                                    'name': elem.get('name'),
                                    'surname': elem.get('surname'),
                                    'register_date': d,
