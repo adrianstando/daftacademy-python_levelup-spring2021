@@ -73,7 +73,7 @@ def register(patient: Patient):
 
     name_and_surname = patient.name + patient.surname
 
-    regex = re.compile('[^a-zA-Z]')
+    regex = re.compile('[AaĄąBbCcĆćDdEeĘęFfGgHhIiJjKkLlŁłMmNnŃńOoÓóPpRrSsŚśTtUuWwYyZzŹźŻż]')
     name_and_surname = regex.sub('', name_and_surname)
 
     vacc_date = today + timedelta(days=len(name_and_surname))
