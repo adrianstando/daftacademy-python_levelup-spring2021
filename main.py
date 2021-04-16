@@ -57,8 +57,10 @@ def method():
 
 
 # ZADANIE 3
-@app.get("/auth", status_code=401)
+@app.get("/auth")
 def auth(password: str, password_hash: str):
+    if password == '' or password_hash == '':
+        raise HTTPException(status_code=401)
     if encrypt_string(password) == password_hash:
         return Response(status_code=204)
     else:
