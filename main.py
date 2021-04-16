@@ -73,7 +73,7 @@ def register(patient: Patient):
 
     app.dict[app.patient_counter] = {'id': app.patient_counter,
                                      'name': patient.name,
-                                     'surname': patient.surname + "k",
+                                     'surname': patient.surname,
                                      'register_date': today.strftime("%Y-%m-%d"),
                                      'vaccination_date': vacc_date.strftime("%Y-%m-%d")}
 
