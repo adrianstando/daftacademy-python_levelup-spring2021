@@ -6,6 +6,7 @@ from pydantic import BaseModel
 import uvicorn
 from datetime import date, timedelta
 import hashlib
+import re
 
 
 def encrypt_string(hash_string):
@@ -69,7 +70,13 @@ def auth(password: str, password_hash: str):
 def register(patient: Patient):
     app.patient_counter += 1
     today = date.today()
-    vacc_date = today + timedelta(days=len(patient.name) + len(patient.surname))
+
+    name_and_surname = patient.name + patient.surname
+
+    regex = re.compile('[^a-zA-Z]')
+    name_and_surname = regex.sub('', name_and_surname)
+
+    vacc_date = today + timedelta(days=len(name_and_surname))
 
     app.dict[app.patient_counter] = {'id': app.patient_counter,
                                      'name': patient.name,
