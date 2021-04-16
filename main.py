@@ -23,16 +23,39 @@ class Patient(BaseModel):
     surname: str
 
 
+# ZADANIE 1
 @app.get("/")
 def root():
     return JSONResponse(status_code=200, content={"message": "Hello world"})
 
 
+# ZADANIE 2
 @app.get("/method")
 def method():
     return JSONResponse(status_code=200, content={"method": "GET"})
 
 
+@app.post("/method")
+def method():
+    return JSONResponse(status_code=201, content={"method": "POST"})
+
+
+@app.delete("/method")
+def method():
+    return JSONResponse(status_code=200, content={"method": "DELETE"})
+
+
+@app.put("/method")
+def method():
+    return JSONResponse(status_code=200, content={"method": "PUT"})
+
+
+@app.options("/method")
+def method():
+    return JSONResponse(status_code=200, content={"method": "OPTIONS"})
+
+
+# ZADANIE 3
 @app.get("/auth")
 def auth(password: str, password_hash: str):
     if encrypt_string(password) == password_hash:
@@ -41,6 +64,7 @@ def auth(password: str, password_hash: str):
         raise HTTPException(status_code=401)
 
 
+# ZADANIE 4
 @app.post("/register")
 def register(patient: Patient):
     app.patient_counter += 1
@@ -56,6 +80,7 @@ def register(patient: Patient):
     return JSONResponse(status_code=201, content=app.dict[app.patient_counter])
 
 
+# ZADANIE 5
 @app.get("/patient/{id}")
 def patient(id: int):
     if id < 0:
@@ -65,6 +90,5 @@ def patient(id: int):
     else:
         return JSONResponse(status_code=200, content=app.dict[id])
 
-
-if __name__ == "__main__":
-    uvicorn.run("main:app")
+# if __name__ == "__main__":
+#    uvicorn.run("main:app")

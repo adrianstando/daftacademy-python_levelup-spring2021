@@ -19,6 +19,22 @@ def test_method_main():
     assert response.status_code == 200
     assert response.json() == {"method": "GET"}
 
+    response = client.post("/method")
+    assert response.status_code == 201
+    assert response.json() == {"method": "POST"}
+
+    response = client.delete("/method")
+    assert response.status_code == 200
+    assert response.json() == {"method": "DELETE"}
+
+    response = client.put("/method")
+    assert response.status_code == 200
+    assert response.json() == {"method": "PUT"}
+
+    response = client.options("/method")
+    assert response.status_code == 200
+    assert response.json() == {"method": "OPTIONS"}
+
 
 def test_password():
     response1 = client.get(
@@ -76,5 +92,3 @@ def get_patient():
 
     response = client.get("/patient/0")
     assert response.status_code == 400
-
-# żeby puścić: w konsoli Linuxowej wpisać pytest
