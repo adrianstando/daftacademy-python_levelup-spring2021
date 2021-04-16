@@ -25,7 +25,7 @@ class Patient(BaseModel):
 
 @app.get("/")
 def root():
-    return JSONResponse(status_code=200, content={"message": "Hello World"})
+    return JSONResponse(status_code=200, content={"message": "Hello world"})
 
 
 @app.get("/method")
