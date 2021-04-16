@@ -26,7 +26,7 @@ class Patient(BaseModel):
 # ZADANIE 1
 @app.get("/")
 def root():
-    return JSONResponse(status_code=200, content={"message": "Hello world"})
+    return JSONResponse(status_code=200, content={"message": "Hello world!"})
 
 
 # ZADANIE 2
