@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi import HTTPException
 from fastapi.responses import Response
 from fastapi.responses import JSONResponse
+from typing import Optional
 from pydantic import BaseModel
 import uvicorn
 from datetime import date, timedelta
@@ -58,7 +59,9 @@ def method():
 
 # ZADANIE 3
 @app.get("/auth")
-def auth(password: str, password_hash: str):
+def auth(password: Optional[str] = None, password_hash: Optional[str] = None):
+    if password is None or password_hash is None:
+        raise HTTPException(status_code=401)
     if password == '' or password_hash == '':
         raise HTTPException(status_code=401)
     if encrypt_string(password) == password_hash:
