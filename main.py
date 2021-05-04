@@ -154,9 +154,9 @@ def login_token(credentials: HTTPBasicCredentials = Depends(security)):
 
 # ZADANIE 3
 def message(txt: str, format_message):
-    if format == "json":
+    if format_message == "json":
         return JSONResponse(content={"message": txt}, status_code=200)
-    elif format == "html":
+    elif format_message == "html":
         return HTMLResponse(content="<h1>" + txt + "</h1>", status_code=200)
     else:
         return PlainTextResponse(content=txt, status_code=200)
