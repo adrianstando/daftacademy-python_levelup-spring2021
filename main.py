@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException, Cookie, Depends
-from fastapi.responses import Response, JSONResponse, HTMLResponse
+from fastapi.responses import Response, JSONResponse, HTMLResponse, PlainTextResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from typing import Optional
 from pydantic import BaseModel
@@ -136,6 +136,7 @@ def login_session(response: Response, credentials: HTTPBasicCredentials = Depend
         return response
     else:
         response.status_code = 401
+        return response
 
 
 @app.post("/login_token")
@@ -147,6 +148,32 @@ def login_token(credentials: HTTPBasicCredentials = Depends(security)):
         app.login_tokens.append(login_token)
 
         return JSONResponse(status_code=201, content={"token": login_token})
+    else:
+        return Response(status_code=401)
+
+
+# ZADANIE 3
+def message(format_message):
+    if format == "json":
+        return JSONResponse(content={"message": "Welcome!"}, status_code=200)
+    elif format == "html":
+        return HTMLResponse("<h1>Welcome!</h1>", status_code=200)
+    else:
+        return PlainTextResponse(content="Welcome!", status_code=200)
+
+
+@app.get("/welcome_session")
+def welcome_session(session_token: str = Cookie(None), format: Optional[str] = None):
+    if session_token in app.session_tokens:
+        return message(format)
+    else:
+        return Response(status_code=401)
+
+
+@app.get("/welcome_token")
+def welcome_token(token: str, format: Optional[str] = None):
+    if token in app.login_tokens:
+        return message(format)
     else:
         return Response(status_code=401)
 
