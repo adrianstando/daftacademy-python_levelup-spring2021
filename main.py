@@ -19,7 +19,7 @@ app.dict = dict()
 
 app.credentials = dict({'login': '4dm1n',
                         'password': 'NotSoSecurePa$$',
-                        'token': []})
+                        'token': None})
 
 
 class Patient(BaseModel):
@@ -123,7 +123,7 @@ def login_session(login: str, password: str, response: Response):
         today = datetime.datetime.now()
         session_token = encrypt_string(f"{login}{password}{today}")
 
-        app.credentials['token'].append(session_token)
+        app.credentials['token'] = session_token
         response.set_cookie(key="session_token", value=session_token)
 
         response.status_code = 201
@@ -134,8 +134,12 @@ def login_session(login: str, password: str, response: Response):
 
 
 @app.post("/login_token")
-def login_token(*, response: Response, session_token: str = Cookie(None)):
-    if session_token in app.credentials['token']:
+def login_token(login: str, password: str):
+    if login == app.credentials.get('login') and password == app.credentials.get('password'):
+        today = datetime.datetime.now()
+        session_token = encrypt_string(f"{login}{password}{today}")
+        app.credentials['token'] = session_token
+
         return JSONResponse(status_code=201, content={"token": session_token})
     else:
         raise HTTPException(status_code=401)
