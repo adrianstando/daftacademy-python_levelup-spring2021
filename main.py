@@ -25,9 +25,6 @@ app.login_tokens = []
 
 app.count_login = 0
 
-app.count_login_tokens = 0
-app.count_session_tokens = 0
-
 
 class Patient(BaseModel):
     name: str
@@ -134,12 +131,10 @@ def login_session(response: Response, credentials: HTTPBasicCredentials = Depend
         session_token = encrypt_string(f"{credentials.username}{credentials.password}{today}{app.count_login}")
         app.count_login += 1
 
-        if app.count_session_tokens != 3:
-            app.session_tokens.append(session_token)
-            app.count_session_tokens += 1
-        else:
+        if len(app.session_tokens) > 3:
             app.session_tokens.pop(0)
-            app.session_tokens.append(session_token)
+
+        app.session_tokens.append(session_token)
 
         response.set_cookie(key="session_token", value=session_token)
 
@@ -158,12 +153,10 @@ def login_token(credentials: HTTPBasicCredentials = Depends(security)):
         login_token_ = encrypt_string(f"{credentials.username}{credentials.password}{today}{app.count_login}")
         app.count_login += 1
 
-        if app.count_login_tokens != 3:
-            app.login_tokens.append(login_token_)
-            app.count_login_tokens += 1
-        else:
+        if len(app.login_tokens) > 3:
             app.login_tokens.pop(0)
-            app.login_tokens.append(login_token_)
+
+        app.login_tokens.append(login_token_)
 
         return JSONResponse(status_code=201, content={"token": login_token_})
     else:
@@ -190,7 +183,9 @@ def welcome_session(session_token: str = Cookie(None), out_format: Optional[str]
 
 @app.get("/welcome_token")
 def welcome_token(token: str, out_format: Optional[str] = None):
-    if token in app.login_tokens:
+    # if token in app.login_tokens:
+    #    return message("Welcome!", out_format)
+    if token in app.session_tokens:
         return message("Welcome!", out_format)
     else:
         return Response(status_code=401)
@@ -208,8 +203,11 @@ def logout_session(session_token: str = Cookie(None), out_format: Optional[str] 
 
 @app.delete("/logout_token")
 def logout_token(token: str, out_format: Optional[str] = None):
-    if token in app.login_tokens:
-        app.login_tokens.remove(token)
+    # if token in app.login_tokens:
+    #    app.login_tokens.remove(token)
+    #    return RedirectResponse(url="/logged_out" + f"?format={out_format}", status_code=303)
+    if token in app.session_tokens:
+        app.session_tokens.remove(token)
         return RedirectResponse(url="/logged_out" + f"?format={out_format}", status_code=303)
     else:
         return Response(status_code=401)
