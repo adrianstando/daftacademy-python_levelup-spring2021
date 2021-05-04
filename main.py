@@ -1,5 +1,6 @@
-from fastapi import FastAPI, HTTPException, Cookie
+from fastapi import FastAPI, HTTPException, Cookie, Depends
 from fastapi.responses import Response, JSONResponse, HTMLResponse
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from typing import Optional
 from pydantic import BaseModel
 import uvicorn
@@ -18,8 +19,9 @@ app.patient_counter = 0
 app.dict = dict()
 
 app.credentials = dict({'login': '4dm1n',
-                        'password': 'NotSoSecurePa$$',
-                        'token': None})
+                        'password': 'NotSoSecurePa$$'})
+app.session_tokens = []
+app.login_tokens = []
 
 
 class Patient(BaseModel):
@@ -117,32 +119,36 @@ def hello_html():
 
 
 # ZADANIE 2
-@app.post("/login_session")
-def login_session(login: str, password: str, response: Response):
-    if login == app.credentials.get('login') and password == app.credentials.get('password'):
-        today = datetime.datetime.now()
-        session_token = encrypt_string(f"{login}{password}{today}")
+security = HTTPBasic()
 
-        app.credentials['token'] = session_token
+
+@app.post("/login_session")
+def login_session(response: Response, credentials: HTTPBasicCredentials = Depends(security)):
+    if credentials.username == app.credentials.get('login') and credentials.password == app.credentials.get('password'):
+        today = datetime.datetime.now()
+        session_token = encrypt_string(f"{credentials.username}{credentials.password}{today}")
+
+        app.session_tokens.append(session_token)
         response.set_cookie(key="session_token", value=session_token)
 
         response.status_code = 201
 
         return response
     else:
-        raise HTTPException(status_code=401)
+        response.status_code = 401
 
 
 @app.post("/login_token")
-def login_token(login: str, password: str):
-    if login == app.credentials.get('login') and password == app.credentials.get('password'):
+def login_token(credentials: HTTPBasicCredentials = Depends(security)):
+    if credentials.username == app.credentials.get('login') and credentials.password == app.credentials.get('password'):
         today = datetime.datetime.now()
-        session_token = encrypt_string(f"{login}{password}{today}")
-        app.credentials['token'] = session_token
+        login_token = encrypt_string(f"{credentials.username}{credentials.password}{today}")
 
-        return JSONResponse(status_code=201, content={"token": session_token})
+        app.login_tokens.append(login_token)
+
+        return JSONResponse(status_code=201, content={"token": login_token})
     else:
-        raise HTTPException(status_code=401)
+        return Response(status_code=401)
 
 
 if __name__ == "__main__":
