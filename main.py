@@ -131,7 +131,7 @@ def login_session(response: Response, credentials: HTTPBasicCredentials = Depend
         session_token = encrypt_string(f"{credentials.username}{credentials.password}{today}{app.count_login}")
         app.count_login += 1
 
-        if len(app.session_tokens) > 3:
+        if len(app.session_tokens) == 3:
             app.session_tokens.pop(0)
 
         app.session_tokens.append(session_token)
@@ -153,7 +153,7 @@ def login_token(credentials: HTTPBasicCredentials = Depends(security)):
         login_token_ = encrypt_string(f"{credentials.username}{credentials.password}{today}{app.count_login}")
         app.count_login += 1
 
-        if len(app.login_tokens) > 3:
+        if len(app.login_tokens) == 3:
             app.login_tokens.pop(0)
 
         app.login_tokens.append(login_token_)
