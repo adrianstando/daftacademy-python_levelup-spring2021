@@ -126,7 +126,7 @@ def login_session(login: str, password: str, response: Response, session_token: 
         app.credentials['token'] = session_token
         response.set_cookie(key="session_token", value=session_token)
 
-        Response(status_code=201)
+        return Response(status_code=201)
     else:
         raise HTTPException(status_code=401)
 
