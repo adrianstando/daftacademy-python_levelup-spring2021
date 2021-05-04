@@ -1,11 +1,9 @@
-from fastapi import FastAPI
-from fastapi import HTTPException
-from fastapi.responses import Response
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, HTTPException, Cookie
+from fastapi.responses import Response, JSONResponse, HTMLResponse
 from typing import Optional
 from pydantic import BaseModel
 import uvicorn
-from datetime import date, timedelta
+import datetime
 import hashlib
 import re
 
@@ -19,11 +17,17 @@ app = FastAPI()
 app.patient_counter = 0
 app.dict = dict()
 
+app.credentials = dict({'login': '4dm1n',
+                        'password': 'NotSoSecurePa$$',
+                        'token': None})
+
 
 class Patient(BaseModel):
     name: str
     surname: str
 
+
+#### HOMEWORK 1
 
 # ZADANIE 1
 @app.get("/")
@@ -74,14 +78,14 @@ def auth(password: Optional[str] = None, password_hash: Optional[str] = None):
 @app.post("/register")
 def register(patient: Patient):
     app.patient_counter += 1
-    today = date.today()
+    today = datetime.date.today()
 
     name_and_surname = patient.name + patient.surname
 
     regex = re.compile('[^a-zA-ZĄąĘęŃńŻżŹźÓó]')
     name_and_surname = regex.sub('', name_and_surname)
 
-    vacc_date = today + timedelta(days=len(name_and_surname))
+    vacc_date = today + datetime.timedelta(days=len(name_and_surname))
 
     app.dict[app.patient_counter] = {'id': app.patient_counter,
                                      'name': patient.name,
@@ -101,6 +105,43 @@ def patient(id: int):
         raise HTTPException(status_code=404)
     else:
         return JSONResponse(status_code=200, content=app.dict[id])
+
+
+#### HOMEWORK 3
+
+# ZADANIE 1
+@app.get("/hello", response_class=HTMLResponse)
+def hello_html():
+    today = datetime.date.today()
+    return "<h1>Hello! Today date is " + today.strftime("%Y-%m-%d") + "</h1>"
+
+
+# ZADANIE 2
+@app.post("/login_session")
+def login_session(login: str, password: str, response: Response, session_token: str = Cookie(None)):
+    if login == app.credentials.get('login') and password == app.credentials.get('password'):
+        today = datetime.today()
+        session_token = encrypt_string(f"{login}{password}{today}")
+
+        app.credentials['token'] = session_token
+        response.set_cookie(key="session_token", value=session_token)
+
+        Response(status_code=201)
+    else:
+        raise HTTPException(status_code=401)
+
+
+@app.post("/login_token")
+def login_token(login: str, password: str):
+    if login == app.credentials.get('login') and password == app.credentials.get('password'):
+        today = datetime.today()
+        session_token = encrypt_string(f"{login}{password}{today}")
+
+        app.credentials['token'] = session_token
+
+        return JSONResponse(status_code=201, content={"token": session_token})
+    else:
+        raise HTTPException(status_code=401)
 
 
 if __name__ == "__main__":
