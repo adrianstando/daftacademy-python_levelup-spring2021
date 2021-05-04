@@ -185,8 +185,6 @@ def welcome_session(session_token: str = Cookie(None), out_format: Optional[str]
 def welcome_token(token: str, out_format: Optional[str] = None):
     if token in app.login_tokens:
         return message("Welcome!", out_format)
-    # if token in app.session_tokens:
-    #    return message("Welcome!", out_format)
     else:
         return Response(status_code=401)
 
@@ -194,6 +192,10 @@ def welcome_token(token: str, out_format: Optional[str] = None):
 # ZADANIE 4
 @app.delete("/logout_session")
 def logout_session(session_token: str = Cookie(None), out_format: Optional[str] = None):
+    # if session_token in app.session_tokens:
+    #    app.session_tokens.remove(session_token)
+    #    return RedirectResponse(url="/logged_out" + f"?format={out_format}", status_code=303)
+
     if session_token in app.session_tokens:
         app.session_tokens.remove(session_token)
         return RedirectResponse(url="/logged_out" + f"?format={out_format}", status_code=303)
@@ -209,6 +211,7 @@ def logout_token(token: str, out_format: Optional[str] = None):
     # if token in app.login_tokens:
     #    app.login_tokens.remove(token)
     #    return RedirectResponse(url="/logged_out" + f"?format={out_format}", status_code=303)
+
     if token in app.session_tokens:
         app.session_tokens.remove(token)
         return RedirectResponse(url="/logged_out" + f"?format={out_format}", status_code=303)
