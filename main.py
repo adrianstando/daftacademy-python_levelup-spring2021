@@ -181,43 +181,43 @@ def message(txt: str, format_message):
 
 
 @app.get("/welcome_session")
-def welcome_session(session_token: str = Cookie(None), format: Optional[str] = None):
+def welcome_session(session_token: str = Cookie(None), out_format: Optional[str] = None):
     if session_token in app.session_tokens:
-        return message("Welcome!", format)
+        return message("Welcome!", out_format)
     else:
         return Response(status_code=401)
 
 
 @app.get("/welcome_token")
-def welcome_token(token: str, format: Optional[str] = None):
+def welcome_token(token: str, out_format: Optional[str] = None):
     if token in app.login_tokens:
-        return message("Welcome!", format)
+        return message("Welcome!", out_format)
     else:
         return Response(status_code=401)
 
 
 # ZADANIE 4
 @app.delete("/logout_session")
-def logout_session(session_token: str = Cookie(None), format: Optional[str] = None):
+def logout_session(session_token: str = Cookie(None), out_format: Optional[str] = None):
     if session_token in app.session_tokens:
         app.session_tokens.remove(session_token)
-        return RedirectResponse(url="/logged_out" + f"?format={format}", status_code=303)
+        return RedirectResponse(url="/logged_out" + f"?format={out_format}", status_code=303)
     else:
         return Response(status_code=401)
 
 
 @app.delete("/logout_token")
-def logout_token(token: str, format: Optional[str] = None):
+def logout_token(token: str, out_format: Optional[str] = None):
     if token in app.login_tokens:
         app.login_tokens.remove(token)
-        return RedirectResponse(url="/logged_out" + f"?format={format}", status_code=303)
+        return RedirectResponse(url="/logged_out" + f"?format={out_format}", status_code=303)
     else:
         return Response(status_code=401)
 
 
 @app.get("/logged_out")
-def logged_out(format: Optional[str] = None):
-    return message("Logged out!", format)
+def logged_out(out_format: Optional[str] = None):
+    return message("Logged out!", out_format)
 
 
 if __name__ == "__main__":
