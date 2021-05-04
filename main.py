@@ -157,7 +157,7 @@ def message(format_message):
     if format == "json":
         return JSONResponse(content={"message": "Welcome!"}, status_code=200)
     elif format == "html":
-        return HTMLResponse("<h1>Welcome!</h1>", status_code=200)
+        return HTMLResponse(content="<h1>Welcome!</h1>", status_code=200)
     else:
         return PlainTextResponse(content="Welcome!", status_code=200)
 
