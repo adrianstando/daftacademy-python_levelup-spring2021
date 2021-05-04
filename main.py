@@ -137,7 +137,7 @@ def login_session(response: Response, credentials: HTTPBasicCredentials = Depend
         if app.count_login_tokens != 3:
             app.login_tokens.append(session_token)
         else:
-            app.login_tokens.append.pop(0)
+            app.login_tokens.pop(0)
             app.login_tokens.append(session_token)
 
         response.set_cookie(key="session_token", value=session_token)
@@ -160,7 +160,7 @@ def login_token(credentials: HTTPBasicCredentials = Depends(security)):
         if app.count_login_tokens != 3:
             app.login_tokens.append(login_token_)
         else:
-            app.login_tokens.append.pop(0)
+            app.login_tokens.pop(0)
             app.login_tokens.append(login_token_)
 
         return JSONResponse(status_code=201, content={"token": login_token_})
