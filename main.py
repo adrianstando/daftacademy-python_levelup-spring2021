@@ -197,6 +197,9 @@ def logout_session(session_token: str = Cookie(None), out_format: Optional[str] 
     if session_token in app.session_tokens:
         app.session_tokens.remove(session_token)
         return RedirectResponse(url="/logged_out" + f"?format={out_format}", status_code=303)
+    elif session_token in app.login_tokens:
+        app.login_tokens.remove(session_token)
+        return RedirectResponse(url="/logged_out" + f"?format={out_format}", status_code=303)
     else:
         return Response(status_code=401)
 
@@ -208,6 +211,9 @@ def logout_token(token: str, out_format: Optional[str] = None):
     #    return RedirectResponse(url="/logged_out" + f"?format={out_format}", status_code=303)
     if token in app.session_tokens:
         app.session_tokens.remove(token)
+        return RedirectResponse(url="/logged_out" + f"?format={out_format}", status_code=303)
+    elif token in app.login_tokens:
+        app.login_tokens.remove(token)
         return RedirectResponse(url="/logged_out" + f"?format={out_format}", status_code=303)
     else:
         return Response(status_code=401)
