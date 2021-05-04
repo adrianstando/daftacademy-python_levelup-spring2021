@@ -23,6 +23,11 @@ app.credentials = dict({'login': '4dm1n',
 app.session_tokens = []
 app.login_tokens = []
 
+app.count_login = 0
+
+app.count_login_tokens = 0
+app.count_session_tokens = 0
+
 
 class Patient(BaseModel):
     name: str
@@ -126,9 +131,15 @@ security = HTTPBasic()
 def login_session(response: Response, credentials: HTTPBasicCredentials = Depends(security)):
     if credentials.username == app.credentials.get('login') and credentials.password == app.credentials.get('password'):
         today = datetime.datetime.now()
-        session_token = encrypt_string(f"{credentials.username}{credentials.password}{today}")
+        session_token = encrypt_string(f"{credentials.username}{credentials.password}{today}{app.count_login}")
+        app.count_login += 1
 
-        app.session_tokens.append(session_token)
+        if app.count_login_tokens != 3:
+            app.login_tokens.append(session_token)
+        else:
+            app.login_tokens.append.pop(0)
+            app.login_tokens.append(session_token)
+
         response.set_cookie(key="session_token", value=session_token)
 
         response.status_code = 201
@@ -143,11 +154,16 @@ def login_session(response: Response, credentials: HTTPBasicCredentials = Depend
 def login_token(credentials: HTTPBasicCredentials = Depends(security)):
     if credentials.username == app.credentials.get('login') and credentials.password == app.credentials.get('password'):
         today = datetime.datetime.now()
-        login_token = encrypt_string(f"{credentials.username}{credentials.password}{today}")
+        login_token_ = encrypt_string(f"{credentials.username}{credentials.password}{today}{app.count_login}")
+        app.count_login += 1
 
-        app.login_tokens.append(login_token)
+        if app.count_login_tokens != 3:
+            app.login_tokens.append(login_token_)
+        else:
+            app.login_tokens.append.pop(0)
+            app.login_tokens.append(login_token_)
 
-        return JSONResponse(status_code=201, content={"token": login_token})
+        return JSONResponse(status_code=201, content={"token": login_token_})
     else:
         return Response(status_code=401)
 
