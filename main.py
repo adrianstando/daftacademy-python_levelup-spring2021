@@ -136,6 +136,7 @@ def login_session(response: Response, credentials: HTTPBasicCredentials = Depend
 
         if app.count_login_tokens != 3:
             app.login_tokens.append(session_token)
+            app.count_session_tokens += 1
         else:
             app.login_tokens.pop(0)
             app.login_tokens.append(session_token)
@@ -159,6 +160,7 @@ def login_token(credentials: HTTPBasicCredentials = Depends(security)):
 
         if app.count_login_tokens != 3:
             app.login_tokens.append(login_token_)
+            app.count_login_tokens += 1
         else:
             app.login_tokens.pop(0)
             app.login_tokens.append(login_token_)
