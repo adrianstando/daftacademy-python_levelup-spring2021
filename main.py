@@ -134,12 +134,12 @@ def login_session(response: Response, credentials: HTTPBasicCredentials = Depend
         session_token = encrypt_string(f"{credentials.username}{credentials.password}{today}{app.count_login}")
         app.count_login += 1
 
-        if app.count_login_tokens != 3:
-            app.login_tokens.append(session_token)
+        if app.count_session_tokens != 3:
+            app.session_tokens.append(session_token)
             app.count_session_tokens += 1
         else:
-            app.login_tokens.pop(0)
-            app.login_tokens.append(session_token)
+            app.session_tokens.pop(0)
+            app.session_tokens.append(session_token)
 
         response.set_cookie(key="session_token", value=session_token)
 
