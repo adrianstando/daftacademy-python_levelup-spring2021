@@ -183,10 +183,10 @@ def welcome_session(session_token: str = Cookie(None), out_format: Optional[str]
 
 @app.get("/welcome_token")
 def welcome_token(token: str, out_format: Optional[str] = None):
-    # if token in app.login_tokens:
-    #    return message("Welcome!", out_format)
-    if token in app.session_tokens:
+    if token in app.login_tokens:
         return message("Welcome!", out_format)
+    # if token in app.session_tokens:
+    #    return message("Welcome!", out_format)
     else:
         return Response(status_code=401)
 
