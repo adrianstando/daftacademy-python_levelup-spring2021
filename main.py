@@ -270,7 +270,7 @@ def get_customers():
 
 
 # ZADANIE 2
-@app.get("/product/{id}")
+@app.get("/products/{id}")
 def get_by_product_id(id: int):
     try:
         connection = sqlite3.connect("northwind.db")
