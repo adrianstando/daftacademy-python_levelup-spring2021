@@ -224,7 +224,7 @@ def get_categories():
         connection = sqlite3.connect("northwind.db")
         df = pd.read_sql_query(
             "SELECT CategoryID as id, CategoryName as name "
-            "from Categories "
+            "FROM Categories "
             "ORDER BY CategoryID",
             connection)
         df = df.to_dict('records')
@@ -251,10 +251,9 @@ def get_customers():
             "CustomerID as id, "
             "CompanyName as name, "
             "Address || ' ' || PostalCode || ' ' || City || ' ' || Country as full_address "
-            "from Customers "
-            "ORDER BY CustomerID",
+            "FROM Customers "
+            "ORDER BY lower(id)",
             connection)
-        # df = df.loc[pd.to_numeric(df.id.str.lower(), errors='coerce').sort_values().index]
         df = df.to_dict('records')
 
         connection.close()
