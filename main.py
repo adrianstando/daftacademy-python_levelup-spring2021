@@ -7,6 +7,8 @@ import uvicorn
 import datetime
 import hashlib
 import re
+import sqlite3
+import pandas as pd
 
 
 def encrypt_string(hash_string):
@@ -192,15 +194,8 @@ def welcome_token(token: str, out_format: Optional[str] = None):
 # ZADANIE 4
 @app.delete("/logout_session")
 def logout_session(session_token: str = Cookie(None), out_format: Optional[str] = None):
-    # if session_token in app.session_tokens:
-    #    app.session_tokens.remove(session_token)
-    #    return RedirectResponse(url="/logged_out" + f"?format={out_format}", status_code=303)
-
     if session_token in app.session_tokens:
         app.session_tokens.remove(session_token)
-        return RedirectResponse(url="/logged_out" + f"?format={out_format}", status_code=303)
-    elif session_token in app.login_tokens:
-        app.login_tokens.remove(session_token)
         return RedirectResponse(url="/logged_out" + f"?format={out_format}", status_code=303)
     else:
         return Response(status_code=401)
@@ -208,14 +203,7 @@ def logout_session(session_token: str = Cookie(None), out_format: Optional[str] 
 
 @app.delete("/logout_token")
 def logout_token(token: str, out_format: Optional[str] = None):
-    # if token in app.login_tokens:
-    #    app.login_tokens.remove(token)
-    #    return RedirectResponse(url="/logged_out" + f"?format={out_format}", status_code=303)
-
-    if token in app.session_tokens:
-        app.session_tokens.remove(token)
-        return RedirectResponse(url="/logged_out" + f"?format={out_format}", status_code=303)
-    elif token in app.login_tokens:
+    if token in app.login_tokens:
         app.login_tokens.remove(token)
         return RedirectResponse(url="/logged_out" + f"?format={out_format}", status_code=303)
     else:
@@ -225,6 +213,54 @@ def logout_token(token: str, out_format: Optional[str] = None):
 @app.get("/logged_out")
 def logged_out(out_format: Optional[str] = None):
     return message("Logged out!", out_format)
+
+
+#### HOMEWORK 4
+
+@app.get("/categories")
+def get_categories():
+    try:
+        connection = sqlite3.connect("northwind.db")
+        df = pd.read_sql_query(
+            "SELECT CategoryID as id, CategoryName as name "
+            "from Categories "
+            "ORDER BY CategoryID",
+            connection)
+        df = df.to_dict('records')
+
+        return JSONResponse(
+            content={
+                "categories": df
+            },
+            status_code=200)
+
+    except Exception as e:
+        raise HTTPException(status_code=401)
+
+
+@app.get("/customers")
+def get_customers():
+    try:
+        connection = sqlite3.connect("northwind.db")
+        connection.text_factory = lambda b: b.decode(errors="ignore")
+        df = pd.read_sql_query(
+            "SELECT "
+            "CustomerID as id, "
+            "CompanyName as name, "
+            "Address || ' ' || PostalCode || ' ' || City || ' ' || Country as full_address "
+            "from Customers "
+            "ORDER BY CustomerID",
+            connection)
+        df = df.to_dict('records')
+
+        return JSONResponse(
+            content={
+                "customers": df
+            },
+            status_code=200)
+    
+    except Exception as e:
+        raise HTTPException(status_code=401)
 
 
 if __name__ == "__main__":
