@@ -297,11 +297,15 @@ def get_by_product_id(id: int):
         raise HTTPException(status_code=404)
 
 
+# ZADANIE 3
 @app.get("/employees")
 def employees(limit: Optional[int] = None, offset: Optional[int] = None, order: Optional[str] = None):
     try:
-        if order not in ['first_name', 'last_name', 'city'] or limit is None or offset is None:
+        if order is None:
+            order = "id"
+        elif order not in ['first_name', 'last_name', 'city'] or limit is None or offset is None:
             return HTTPException(status_code=400)
+
         connection = sqlite3.connect("northwind.db")
         connection.text_factory = lambda b: b.decode(errors="ignore")
         df = pd.read_sql_query(
