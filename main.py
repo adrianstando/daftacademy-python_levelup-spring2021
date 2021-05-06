@@ -260,13 +260,11 @@ def get_customers():
         connection.close()
 
         return JSONResponse(
-            content={
-                "customers": df
-            },
+            content=df,
             status_code=200)
 
     except Exception as e:
-        raise HTTPException(status_code=401)
+        raise HTTPException(status_code=404)
 
 
 # ZADANIE 2
@@ -296,7 +294,7 @@ def get_by_product_id(id: int):
             status_code=200)
 
     except Exception as e:
-        raise HTTPException(status_code=401)
+        raise HTTPException(status_code=404)
 
 
 @app.get("/employees")
