@@ -217,6 +217,7 @@ def logged_out(out_format: Optional[str] = None):
 
 #### HOMEWORK 4
 
+# ZADANIE 1
 @app.get("/categories")
 def get_categories():
     try:
@@ -227,6 +228,8 @@ def get_categories():
             "ORDER BY CategoryID",
             connection)
         df = df.to_dict('records')
+
+        connection.close()
 
         return JSONResponse(
             content={
@@ -251,14 +254,80 @@ def get_customers():
             "from Customers "
             "ORDER BY CustomerID",
             connection)
+        # df = df.loc[pd.to_numeric(df.id.str.lower(), errors='coerce').sort_values().index]
         df = df.to_dict('records')
+
+        connection.close()
 
         return JSONResponse(
             content={
                 "customers": df
             },
             status_code=200)
-    
+
+    except Exception as e:
+        raise HTTPException(status_code=401)
+
+
+# ZADANIE 2
+@app.get("/product/{id}")
+def get_by_product_id(id: int):
+    try:
+        connection = sqlite3.connect("northwind.db")
+        connection.text_factory = lambda b: b.decode(errors="ignore")
+        df = pd.read_sql_query(
+            "SELECT ProductID as id, ProductName as name "
+            "FROM Products "
+            "WHERE ProductID = :id_sql",
+            params={"id_sql": id},
+            con=connection)
+
+        if df.empty:
+            raise HTTPException(status_code=404)
+
+        df = df.to_dict('records')[0]
+
+        connection.close()
+
+        return JSONResponse(
+            content={
+                "customers": df
+            },
+            status_code=200)
+
+    except Exception as e:
+        raise HTTPException(status_code=401)
+
+
+@app.get("/employees")
+def employees(limit: Optional[int] = None, offset: Optional[int] = None, order: Optional[str] = None):
+    try:
+        if order not in ['first_name', 'last_name', 'city'] or limit is None or offset is None:
+            return HTTPException(status_code=400)
+        connection = sqlite3.connect("northwind.db")
+        connection.text_factory = lambda b: b.decode(errors="ignore")
+        df = pd.read_sql_query(
+            "SELECT EmployeeID as id, LastName as last_name, FirstName as first_name, City as city"
+            "FROM Employees "
+            "ORDER BY :order "
+            "OFFSET :offset "
+            "LIMIT :limit",
+            connection,
+            params={'order': order, 'offset': offset, 'limit': limit})
+
+        if df.empty:
+            return HTTPException(status_code=404)
+
+        df = df.to_dict('records')
+
+        connection.close()
+
+        return JSONResponse(
+            content={
+                "employees": df
+            },
+            status_code=200)
+
     except Exception as e:
         raise HTTPException(status_code=401)
 
