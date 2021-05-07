@@ -414,7 +414,7 @@ class NewCategoryPost(BaseModel):
 
 
 def remove_new_word(s: str):
-    s = s.replace("new", "").replace("New", "").replace("NEW", "").lstrip()
+    #s = s.replace("new", "").replace("New", "").replace("NEW", "").lstrip()
     return s
 
 
