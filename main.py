@@ -513,7 +513,7 @@ def categories_delete(id: int):
         cursor = connection.cursor()
         cursor.execute("DELETE FROM Categories "
                        "WHERE CategoryID = ?",
-                       parameters=[id])
+                       [id])
         connection.commit()
 
         df = pd.read_sql_query(
