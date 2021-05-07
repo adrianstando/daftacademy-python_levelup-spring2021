@@ -369,5 +369,43 @@ def products_extended():
         raise HTTPException(status_code=400)
 
 
+# ZADANIE 5
+@app.get("/products/{id}/orders")
+def products_id_orders(id: int):
+    try:
+        connection = sqlite3.connect("northwind.db")
+        connection.text_factory = lambda b: b.decode(errors="ignore")
+        df = pd.read_sql_query(
+            "SELECT Orders.OrderID as id, "
+            "Customers.CompanyName as customer, "
+            "`Order Details`.Quantity as quantity, "
+            "ROUND("
+            "(`Order Details`.UnitPrice * `Order Details`.Quantity) - "
+            "(`Order Details`.Discount * `Order Details`.UnitPrice * `Order Details`.Quantity)"
+            ", 2) as total_price "
+            "FROM Orders "
+            "JOIN Customers ON Orders.CustomerID=Customers.CustomerID "
+            "JOIN `Order Details` ON `Order Details`.OrderID=Orders.OrderID "
+            "WHERE `Order Details`.ProductID = ?",
+            connection,
+            params=[id])
+
+        if df.empty:
+            raise HTTPException(status_code=404)
+
+        df = df.to_dict('records')
+
+        connection.close()
+
+        return JSONResponse(
+            content={
+                "orders": df
+            },
+            status_code=200)
+
+    except Exception as e:
+        raise HTTPException(status_code=404)
+
+
 if __name__ == "__main__":
     uvicorn.run("main:app")
