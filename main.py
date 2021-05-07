@@ -407,5 +407,131 @@ def products_id_orders(id: int):
         raise HTTPException(status_code=404)
 
 
+# ZADANIE 6
+
+class NewCategoryPost(BaseModel):
+    name: str
+
+
+@app.post("/categories")
+def categories_post(input: NewCategoryPost):
+    try:
+        connection = sqlite3.connect("northwind.db")
+        connection.text_factory = lambda b: b.decode(errors="ignore")
+
+        cursor = connection.cursor()
+        cursor.execute("INSERT INTO Categories(CategoryName) "
+                       "VALUES (?)",
+                       parameters=[input.name])
+
+        df = pd.read_sql_query(
+            "SELECT CategoryID as id, CategoryName as name "
+            "FROM Categories "
+            "WHERE CategoryName = ?",
+            connection,
+            params=[input.name])
+
+        if df.empty:
+            raise HTTPException(status_code=404)
+
+        df = df.to_dict('records')
+
+        connection.close()
+
+        return JSONResponse(
+            content=df,
+            status_code=201)
+
+    except Exception as e:
+        raise HTTPException(status_code=404)
+
+
+@app.put("/categories/{id}")
+def categories_post(id: int, input: NewCategoryPost):
+    try:
+        connection = sqlite3.connect("northwind.db")
+        connection.text_factory = lambda b: b.decode(errors="ignore")
+
+        df = pd.read_sql_query(
+            "SELECT CategoryID as id, CategoryName as name "
+            "FROM Categories "
+            "WHERE CategoryID = ?",
+            connection,
+            params=[id])
+
+        if df.empty:
+            raise HTTPException(status_code=404)
+
+        cursor = connection.cursor()
+        cursor.execute("UPDATE Categories "
+                       "SET CategoryName = ? "
+                       "WHERE CategoryID = ?",
+                       parameters=[input.name, id])
+
+        df = pd.read_sql_query(
+            "SELECT CategoryID as id, CategoryName as name "
+            "FROM Categories "
+            "WHERE CategoryID = ?",
+            connection,
+            params=[id])
+
+        if df.empty:
+            raise HTTPException(status_code=404)
+
+        df = df.to_dict('records')
+
+        connection.close()
+
+        return JSONResponse(
+            content=df,
+            status_code=200)
+
+    except Exception as e:
+        raise HTTPException(status_code=404)
+
+
+@app.delete("/categories/{id}")
+def categories_delete(id: int):
+    try:
+        connection = sqlite3.connect("northwind.db")
+        connection.text_factory = lambda b: b.decode(errors="ignore")
+
+        df = pd.read_sql_query(
+            "SELECT CategoryID as id, CategoryName as name "
+            "FROM Categories "
+            "WHERE CategoryID = ?",
+            connection,
+            params=[id])
+
+        if df.empty:
+            raise HTTPException(status_code=404)
+
+        cursor = connection.cursor()
+        cursor.execute("DELETE FROM Categories "
+                       "WHERE CategoryID = ?",
+                       parameters=[id])
+
+        df = pd.read_sql_query(
+            "SELECT CategoryID as id, CategoryName as name "
+            "FROM Categories "
+            "WHERE CategoryID = ?",
+            connection,
+            params=[id])
+
+        if not df.empty:
+            raise HTTPException(status_code=404)
+
+        connection.close()
+
+        return JSONResponse(
+            content={
+                "deleted": id
+            },
+            status_code=200)
+
+    except Exception as e:
+        raise HTTPException(status_code=404)
+
+
 if __name__ == "__main__":
     uvicorn.run("main:app")
