@@ -530,7 +530,7 @@ def categories_delete(id: int):
 
         return JSONResponse(
             content={
-                "deleted": id
+                "deleted": 1
             },
             status_code=200)
 
