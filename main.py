@@ -421,13 +421,13 @@ def categories_post(input: NewCategoryPost):
 
         cursor = connection.cursor()
         cursor.execute("INSERT INTO Categories(CategoryName) "
-                       "VALUES (" + input.name + ")")
+                       "VALUES ('" + input.name + "')")
         connection.commit()
 
         df = pd.read_sql_query(
             "SELECT CategoryID as id, CategoryName as name "
             "FROM Categories "
-            "WHERE CategoryName = " + input.name,
+            "WHERE CategoryName = '" + input.name + "'",
             connection)
 
         if df.empty:
