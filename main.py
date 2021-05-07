@@ -433,7 +433,7 @@ def categories_post(input: NewCategoryPost):
         if df.empty:
             raise HTTPException(status_code=404)
 
-        df = df.to_dict('records')
+        df = df.to_dict('records')[0]
 
         connection.close()
 
@@ -477,7 +477,7 @@ def categories_post(id: int, input: NewCategoryPost):
         if df.empty:
             raise HTTPException(status_code=404)
 
-        df = df.to_dict('records')
+        df = df.to_dict('records')[0]
 
         connection.close()
 
