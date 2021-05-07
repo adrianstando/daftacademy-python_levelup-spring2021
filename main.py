@@ -413,18 +413,13 @@ class NewCategoryPost(BaseModel):
     name: str
 
 
-def remove_new_word(s: str):
-    #s = s.replace("new", "").replace("New", "").replace("NEW", "").lstrip()
-    return s
-
-
 @app.post("/categories")
 def categories_post(input: NewCategoryPost):
     try:
         connection = sqlite3.connect("northwind.db")
         connection.text_factory = lambda b: b.decode(errors="ignore")
 
-        category_name = remove_new_word(input.name)
+        category_name = input.name
 
         cursor = connection.cursor()
         cursor.execute("INSERT INTO Categories(CategoryName) "
@@ -458,7 +453,7 @@ def categories_post(id: int, input: NewCategoryPost):
         connection = sqlite3.connect("northwind.db")
         connection.text_factory = lambda b: b.decode(errors="ignore")
 
-        category_name = remove_new_word(input.name)
+        category_name = input.name
 
         df = pd.read_sql_query(
             "SELECT CategoryID as id, CategoryName as name "
@@ -474,7 +469,8 @@ def categories_post(id: int, input: NewCategoryPost):
         cursor.execute("UPDATE Categories "
                        "SET CategoryName = '" + category_name + "' "
                        "WHERE CategoryID = ?",
-                       parameters=[id])
+                       [id])
+        connection.commit()
 
         df = pd.read_sql_query(
             "SELECT CategoryID as id, CategoryName as name "
@@ -518,6 +514,7 @@ def categories_delete(id: int):
         cursor.execute("DELETE FROM Categories "
                        "WHERE CategoryID = ?",
                        parameters=[id])
+        connection.commit()
 
         df = pd.read_sql_query(
             "SELECT CategoryID as id, CategoryName as name "
