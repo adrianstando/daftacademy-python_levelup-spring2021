@@ -302,22 +302,24 @@ def employees(limit: Optional[int] = None, offset: Optional[int] = None, order: 
     try:
         if order is None:
             order = "id"
-        elif order not in ['first_name', 'last_name', 'city'] or limit is None or offset is None:
-            return HTTPException(status_code=400)
+        elif order not in ['first_name', 'last_name', 'city']:
+            raise HTTPException(status_code=400)
+        if limit is None or offset is None:
+            raise HTTPException(status_code=400)
 
         connection = sqlite3.connect("northwind.db")
         connection.text_factory = lambda b: b.decode(errors="ignore")
         df = pd.read_sql_query(
-            "SELECT EmployeeID as id, LastName as last_name, FirstName as first_name, City as city"
+            "SELECT EmployeeID as id, LastName as last_name, FirstName as first_name, City as city "
             "FROM Employees "
             "ORDER BY :order "
-            "OFFSET :offset "
-            "LIMIT :limit",
+            "LIMIT :limit "
+            "OFFSET :offset",
             connection,
             params={'order': order, 'offset': offset, 'limit': limit})
 
         if df.empty:
-            return HTTPException(status_code=404)
+            raise HTTPException(status_code=400)
 
         df = df.to_dict('records')
 
@@ -330,7 +332,7 @@ def employees(limit: Optional[int] = None, offset: Optional[int] = None, order: 
             status_code=200)
 
     except Exception as e:
-        raise HTTPException(status_code=401)
+        raise HTTPException(status_code=400)
 
 
 if __name__ == "__main__":
