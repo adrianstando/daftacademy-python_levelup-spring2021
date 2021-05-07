@@ -304,8 +304,9 @@ def employees(limit: Optional[int] = None, offset: Optional[int] = None, order: 
             order = "id"
         elif order not in ['first_name', 'last_name', 'city', 'id']:
             raise HTTPException(status_code=400)
-        #if limit is None or offset is None:
-        #    raise HTTPException(status_code=400)
+        if limit is None or offset is None:
+            limit = 4
+            offset = 0
 
         connection = sqlite3.connect("northwind.db")
         connection.text_factory = lambda b: b.decode(errors="ignore")
