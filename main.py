@@ -316,7 +316,7 @@ def employees(limit: Optional[int] = None, offset: Optional[int] = None, order: 
             "LIMIT ? "
             "OFFSET ?",
             connection,
-            params=[offset, limit])
+            params=[limit, offset])
 
         if df.empty:
             raise HTTPException(status_code=400)
