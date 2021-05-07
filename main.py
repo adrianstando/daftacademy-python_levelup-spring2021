@@ -421,15 +421,14 @@ def categories_post(input: NewCategoryPost):
 
         cursor = connection.cursor()
         cursor.execute("INSERT INTO Categories(CategoryName) "
-                       "VALUES (?)",
-                       parameters=[input.name])
+                       "VALUES (" + input.name + ")")
+        connection.commit()
 
         df = pd.read_sql_query(
             "SELECT CategoryID as id, CategoryName as name "
             "FROM Categories "
-            "WHERE CategoryName = ?",
-            connection,
-            params=[input.name])
+            "WHERE CategoryName = " + input.name,
+            connection)
 
         if df.empty:
             raise HTTPException(status_code=404)
