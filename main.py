@@ -413,21 +413,28 @@ class NewCategoryPost(BaseModel):
     name: str
 
 
+def remove_new_word(s: str):
+    s = s.replace("new", "").replace("New", "").replace("NEW", "").lstrip()
+    return s
+
+
 @app.post("/categories")
 def categories_post(input: NewCategoryPost):
     try:
         connection = sqlite3.connect("northwind.db")
         connection.text_factory = lambda b: b.decode(errors="ignore")
 
+        category_name = remove_new_word(input.name)
+
         cursor = connection.cursor()
         cursor.execute("INSERT INTO Categories(CategoryName) "
-                       "VALUES ('" + input.name + "')")
+                       "VALUES ('" + category_name + "')")
         connection.commit()
 
         df = pd.read_sql_query(
             "SELECT CategoryID as id, CategoryName as name "
             "FROM Categories "
-            "WHERE CategoryName = '" + input.name + "'",
+            "WHERE CategoryName = '" + category_name + "'",
             connection)
 
         if df.empty:
@@ -451,6 +458,8 @@ def categories_post(id: int, input: NewCategoryPost):
         connection = sqlite3.connect("northwind.db")
         connection.text_factory = lambda b: b.decode(errors="ignore")
 
+        category_name = remove_new_word(input.name)
+
         df = pd.read_sql_query(
             "SELECT CategoryID as id, CategoryName as name "
             "FROM Categories "
@@ -463,9 +472,9 @@ def categories_post(id: int, input: NewCategoryPost):
 
         cursor = connection.cursor()
         cursor.execute("UPDATE Categories "
-                       "SET CategoryName = ? "
+                       "SET CategoryName = '" + category_name + "' "
                        "WHERE CategoryID = ?",
-                       parameters=[input.name, id])
+                       parameters=[id])
 
         df = pd.read_sql_query(
             "SELECT CategoryID as id, CategoryName as name "
