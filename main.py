@@ -335,5 +335,39 @@ def employees(limit: Optional[int] = None, offset: Optional[int] = None, order: 
         raise HTTPException(status_code=400)
 
 
+# ZADANIE 4
+@app.get("/products_extended")
+def products_extended():
+    try:
+        connection = sqlite3.connect("northwind.db")
+        connection.text_factory = lambda b: b.decode(errors="ignore")
+        df = pd.read_sql_query(
+            "SELECT Products.ProductID as id, "
+            "Products.ProductName as name, "
+            "Categories.CategoryName as category, "
+            "Suppliers.CompanyName as supplier "
+            "FROM Products "
+            "JOIN Categories ON Products.CategoryID=Categories.CategoryID "
+            "JOIN Suppliers ON Products.SupplierID=Suppliers.SupplierID "
+            "ORDER BY Products.ProductID",
+            connection)
+
+        if df.empty:
+            raise HTTPException(status_code=400)
+
+        df = df.to_dict('records')
+
+        connection.close()
+
+        return JSONResponse(
+            content={
+                "products_extended": df
+            },
+            status_code=200)
+
+    except Exception as e:
+        raise HTTPException(status_code=400)
+
+
 if __name__ == "__main__":
     uvicorn.run("main:app")
