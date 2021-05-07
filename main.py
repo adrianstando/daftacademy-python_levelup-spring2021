@@ -277,8 +277,8 @@ def get_by_product_id(id: int):
         df = pd.read_sql_query(
             "SELECT ProductID as id, ProductName as name "
             "FROM Products "
-            "WHERE ProductID = :id_sql",
-            params={"id_sql": id},
+            "WHERE ProductID = ?",
+            params=[id],
             con=connection)
 
         if df.empty:
@@ -312,11 +312,11 @@ def employees(limit: Optional[int] = None, offset: Optional[int] = None, order: 
         df = pd.read_sql_query(
             "SELECT EmployeeID as id, LastName as last_name, FirstName as first_name, City as city "
             "FROM Employees "
-            "ORDER BY :order "
-            "LIMIT :limit "
-            "OFFSET :offset",
+            "ORDER BY " + order + " " +
+            "LIMIT ? "
+            "OFFSET ?",
             connection,
-            params={'order': order, 'offset': offset, 'limit': limit})
+            params=[offset, limit])
 
         if df.empty:
             raise HTTPException(status_code=400)
