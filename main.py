@@ -469,7 +469,7 @@ def categories_post(id: int, input: NewCategoryPost):
         cursor = connection.cursor()
         cursor.execute("UPDATE Categories "
                        "SET CategoryName = '" + category_name + "' "
-                       "WHERE CategoryID = ?",
+                                                                "WHERE CategoryID = ?",
                        [id])
         connection.commit()
 
@@ -533,6 +533,62 @@ def categories_delete(id: int):
             content={
                 "deleted": 1
             },
+            status_code=200)
+
+    except Exception as e:
+        raise HTTPException(status_code=404)
+
+
+### HOMEWORK 5
+
+# ZADANIE 1
+@app.get("/suppliers")
+def get_supplier():
+    try:
+        connection = sqlite3.connect("northwind.db")
+        connection.text_factory = lambda b: b.decode(errors="ignore")
+
+        df = pd.read_sql_query(
+            "SELECT SupplierID, CompanyName "
+            "FROM Suppliers "
+            "ORDER BY SupplierID",
+            connection)
+
+        if df.empty:
+            raise HTTPException(status_code=404)
+
+        connection.close()
+        df = df.to_dict('records')
+
+        return JSONResponse(
+            content=df,
+            status_code=200)
+
+    except Exception as e:
+        raise HTTPException(status_code=404)
+
+
+@app.get("/suppliers/{id}")
+def get_supplier_id(id: int):
+    try:
+        connection = sqlite3.connect("northwind.db")
+        connection.text_factory = lambda b: b.decode(errors="ignore")
+
+        df = pd.read_sql_query(
+            "SELECT * "
+            "FROM Suppliers "
+            "WHERE SupplierID = ?",
+            connection,
+            params=[id])
+
+        if df.empty:
+            raise HTTPException(status_code=404)
+
+        connection.close()
+        df = df.to_dict('records')[0]
+
+        return JSONResponse(
+            content=df,
             status_code=200)
 
     except Exception as e:
