@@ -664,7 +664,8 @@ def categories_post(input: NewSupplier):
         cursor.execute("INSERT INTO Suppliers(CompanyName, ContactName, ContactTitle, Address, City, PostalCode, Country, Phone) "
                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                        [input.CompanyName, input.ContactName, input.ContactTitle, input.Address, input.ContactName, input.PostalCode, input.Country, input.Phone])
-        connection.commit()
+
+        print(cursor.lastrowid)
 
         df = pd.read_sql_query(
             "SELECT SupplierID, CompanyName, ContactName, ContactTitle, Address, City, PostalCode, Country, Phone, Fax, HomePage "
@@ -672,7 +673,7 @@ def categories_post(input: NewSupplier):
             "WHERE SupplierID = ?",
             connection,
             cursor.lastrowid)
-
+        connection.commit()
         if df.empty:
             raise HTTPException(status_code=404)
 
