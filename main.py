@@ -664,7 +664,7 @@ def categories_post(input: NewSupplier):
         cursor.execute(
             "INSERT INTO Suppliers(CompanyName, ContactName, ContactTitle, Address, City, PostalCode, Country, Phone) "
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            [input.CompanyName, input.ContactName, input.ContactTitle, input.Address, input.ContactName,
+            [input.CompanyName, input.ContactName, input.ContactTitle, input.Address, input.City,
              input.PostalCode, input.Country, input.Phone])
 
         df = pd.read_sql_query(
