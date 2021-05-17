@@ -661,19 +661,21 @@ def categories_post(input: NewSupplier):
         connection.text_factory = lambda b: b.decode(encoding='latin1')
 
         cursor = connection.cursor()
-        cursor.execute("INSERT INTO Suppliers(CompanyName, ContactName, ContactTitle, Address, City, PostalCode, Country, Phone) "
-                       "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                       [input.CompanyName, input.ContactName, input.ContactTitle, input.Address, input.ContactName, input.PostalCode, input.Country, input.Phone])
-
-        print(cursor.lastrowid)
+        cursor.execute(
+            "INSERT INTO Suppliers(CompanyName, ContactName, ContactTitle, Address, City, PostalCode, Country, Phone) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            [input.CompanyName, input.ContactName, input.ContactTitle, input.Address, input.ContactName,
+             input.PostalCode, input.Country, input.Phone])
 
         df = pd.read_sql_query(
             "SELECT SupplierID, CompanyName, ContactName, ContactTitle, Address, City, PostalCode, Country, Phone, Fax, HomePage "
             "FROM Suppliers "
             "WHERE SupplierID = ?",
             connection,
-            cursor.lastrowid)
+            [cursor.lastrowid])
+
         connection.commit()
+
         if df.empty:
             raise HTTPException(status_code=404)
 
