@@ -667,7 +667,7 @@ def categories_post(input: NewSupplier):
         connection.commit()
 
         df = pd.read_sql_query(
-            "SELECT * "
+            "SELECT SupplierID, CompanyName, ContactName, ContactTitle, Address, City, PostalCode, Country, Phone, Fax, HomePage "
             "FROM Suppliers "
             "WHERE SupplierID = ?",
             connection,
