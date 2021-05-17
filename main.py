@@ -645,17 +645,17 @@ def suppliers_products(id: int):
 # ZADANIE 3
 class NewSupplier(BaseModel):
     CompanyName: str
-    ContactName: str
-    ContactTitle: str
-    Address: str
-    City: str
-    PostalCode: str
-    Country: str
-    Phone: str
+    ContactName: Optional[str] = None
+    ContactTitle: Optional[str] = None
+    Address: Optional[str] = None
+    City: Optional[str] = None
+    PostalCode: Optional[str] = None
+    Country: Optional[str] = None
+    Phone: Optional[str] = None
 
 
 @app.post("/suppliers")
-def categories_post(CompanyName: str, ContactName: Optional[str] = None, ContactTitle: Optional[str] = None, Address: Optional[str] = None, City: Optional[str] = None, PostalCode: Optional[str] = None, Country: Optional[str] = None, Phone: Optional[str] = None):
+def categories_post(input: NewSupplier):
     try:
         connection = sqlite3.connect("northwind.db")
         connection.text_factory = lambda b: b.decode(encoding='latin1')
@@ -664,8 +664,8 @@ def categories_post(CompanyName: str, ContactName: Optional[str] = None, Contact
         cursor.execute(
             "INSERT INTO Suppliers(CompanyName, ContactName, ContactTitle, Address, City, PostalCode, Country, Phone) "
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            [CompanyName, ContactName, ContactTitle, Address, City,
-             PostalCode, Country, Phone])
+            [input.CompanyName, input.ContactName, input.ContactTitle, input.Address, input.City,
+             input.PostalCode, input.Country, input.Phone])
 
         df = pd.read_sql_query(
             "SELECT SupplierID, CompanyName, ContactName, ContactTitle, Address, City, PostalCode, Country, Phone, Fax, HomePage "
