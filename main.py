@@ -600,6 +600,7 @@ def get_supplier_id(id: int):
         raise HTTPException(status_code=404)
 
 
+# ZADANIE 2
 @app.get("/suppliers/{id}/products")
 def suppliers_products(id: int):
     try:
@@ -636,6 +637,52 @@ def suppliers_products(id: int):
         return JSONResponse(
             content=df,
             status_code=200)
+
+    except Exception as e:
+        raise HTTPException(status_code=404)
+
+
+# ZADANIE 3
+class NewSupplier(BaseModel):
+    CompanyName: str
+    ContactName: str
+    ContactTitle: str
+    Address: str
+    City: str
+    PostalCode: str
+    Country: str
+    Phone: str
+
+
+@app.post("/suppliers")
+def categories_post(input: NewSupplier):
+    try:
+        connection = sqlite3.connect("northwind.db")
+        connection.text_factory = lambda b: b.decode(encoding='latin1')
+
+        cursor = connection.cursor()
+        cursor.execute("INSERT INTO Suppliers(CompanyName, ContactName, ContactTitle, Address, City, PostalCode, Country, Phone) "
+                       "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                       [input.CompanyName, input.ContactName, input.ContactTitle, input.Address, input.ContactName, input.PostalCode, input.Country, input.Phone])
+        connection.commit()
+
+        df = pd.read_sql_query(
+            "SELECT * "
+            "FROM Suppliers "
+            "WHERE SupplierID = ?",
+            connection,
+            cursor.lastrowid)
+
+        if df.empty:
+            raise HTTPException(status_code=404)
+
+        df = df.to_dict('records')[0]
+
+        connection.close()
+
+        return JSONResponse(
+            content=df,
+            status_code=201)
 
     except Exception as e:
         raise HTTPException(status_code=404)
