@@ -600,5 +600,45 @@ def get_supplier_id(id: int):
         raise HTTPException(status_code=404)
 
 
+@app.get("/suppliers/{id}/products")
+def suppliers_products(id: int):
+    try:
+        connection = sqlite3.connect("northwind.db")
+        # connection.text_factory = lambda x: str(x, 'utf-8')
+        connection.text_factory = lambda b: b.decode(errors="ignore")
+
+        df = pd.read_sql_query(
+            "SELECT Products.ProductID, Products.ProductName, Categories.CategoryID, Categories.CategoryName, Discontinued "
+            "FROM Products "
+            "JOIN Categories ON Categories.CategoryID = Products.CategoryID "
+            "WHERE Products.SupplierID = ? "
+            "ORDER BY Products.ProductID DESC",
+            connection,
+            params=[id])
+
+        if df.empty:
+            raise HTTPException(status_code=404)
+
+        connection.close()
+        df = df.to_dict('records')
+        for k in df:
+            for key in k.keys():
+                if isinstance(k[key], str):
+                    k[key] = k[key].rstrip()
+                    k[key] = k[key].replace("\n", " ")
+
+        for k in df:
+            k['Category'] = {"CategoryID": k['CategoryID'], "CategoryName": k['CategoryName']}
+            k.pop('CategoryID', None)
+            k.pop('CategoryName', None)
+
+        return JSONResponse(
+            content=df,
+            status_code=200)
+
+    except Exception as e:
+        raise HTTPException(status_code=404)
+
+
 if __name__ == "__main__":
     uvicorn.run("main:app")
