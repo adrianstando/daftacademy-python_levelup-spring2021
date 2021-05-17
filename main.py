@@ -605,7 +605,7 @@ def suppliers_products(id: int):
     try:
         connection = sqlite3.connect("northwind.db")
         # connection.text_factory = lambda x: str(x, 'utf-8')
-        connection.text_factory = lambda b: b.decode(errors="ignore")
+        connection.text_factory = lambda b: b.decode(encoding='latin1')
 
         df = pd.read_sql_query(
             "SELECT Products.ProductID, Products.ProductName, Categories.CategoryID, Categories.CategoryName, Discontinued "
