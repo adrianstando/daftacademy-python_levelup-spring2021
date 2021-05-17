@@ -631,6 +631,7 @@ def suppliers_products(id: int):
             k['Category'] = {"CategoryID": k['CategoryID'], "CategoryName": k['CategoryName']}
             k.pop('CategoryID', None)
             k.pop('CategoryName', None)
+            k['Discontinued'] = int(k['Discontinued'])
 
         return JSONResponse(
             content=df,
