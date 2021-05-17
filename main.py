@@ -672,7 +672,7 @@ def categories_post(input: NewSupplier):
             "FROM Suppliers "
             "WHERE SupplierID = ?",
             connection,
-            [cursor.lastrowid])
+            params=[cursor.lastrowid])
 
         connection.commit()
 
