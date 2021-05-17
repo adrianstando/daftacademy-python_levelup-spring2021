@@ -570,9 +570,10 @@ def get_supplier():
 
 @app.get("/suppliers/{id}")
 def get_supplier_id(id: int):
-    #try:
+    try:
         connection = sqlite3.connect("northwind.db")
-        connection.text_factory = lambda x: str(x, 'latin1')
+        # connection.text_factory = lambda x: str(x, 'utf-8')
+        connection.text_factory = lambda b: b.decode(errors="ignore")
 
         df = pd.read_sql_query(
             "SELECT * "
@@ -595,8 +596,8 @@ def get_supplier_id(id: int):
             content=df,
             status_code=200)
 
-    #except Exception as e:
-        #raise HTTPException(status_code=404)
+    except Exception as e:
+        raise HTTPException(status_code=404)
 
 
 if __name__ == "__main__":
