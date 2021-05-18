@@ -736,7 +736,6 @@ def suppliers_put(id: int, input: UpdateSupplier):
         cursor = connection.cursor()
         cursor.execute(sql,
                        tab_params + [id])
-        connection.commit()
 
         df = pd.read_sql_query(
             "SELECT SupplierID, CompanyName, ContactName, ContactTitle, Address, City, PostalCode, Country, Phone, Fax, HomePage "
@@ -744,6 +743,8 @@ def suppliers_put(id: int, input: UpdateSupplier):
             "WHERE SupplierID = ?",
             connection,
             params=[id])
+
+        connection.commit()
 
         if df.empty:
             raise HTTPException(status_code=404)
