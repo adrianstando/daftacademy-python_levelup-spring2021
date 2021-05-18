@@ -762,8 +762,8 @@ def suppliers_put(id: int, input: UpdateSupplier):
 
 
 # ZADANIE 5
-@app.delete("/suppliers/{id}")
-def suppliers_delete(id: int, response: Response):
+@app.delete("/suppliers/{id}", status_code=204)
+def suppliers_delete(id: int):
     try:
         connection = sqlite3.connect("northwind.db")
         connection.text_factory = lambda b: b.decode(encoding='latin1')
@@ -795,9 +795,6 @@ def suppliers_delete(id: int, response: Response):
             raise HTTPException(status_code=404)
 
         connection.close()
-
-        response.status_code = 204
-        return response
 
     except Exception as e:
         raise HTTPException(status_code=404)
