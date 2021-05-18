@@ -779,7 +779,7 @@ def suppliers_delete(id: int):
             raise HTTPException(status_code=404)
 
         cursor = connection.cursor()
-        cursor.execute("DELETE FROM Suppliers"
+        cursor.execute("DELETE FROM Suppliers "
                        "WHERE SupplierID = ?",
                        [id])
         connection.commit()
