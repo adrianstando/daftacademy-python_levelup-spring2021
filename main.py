@@ -546,7 +546,7 @@ def categories_delete(id: int):
 def get_supplier():
     try:
         connection = sqlite3.connect("northwind.db")
-        connection.text_factory = lambda b: b.decode(errors="ignore")
+        connection.text_factory = lambda b: b.decode(encoding='latin1')
 
         df = pd.read_sql_query(
             "SELECT SupplierID, CompanyName "
