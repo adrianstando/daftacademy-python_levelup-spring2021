@@ -691,5 +691,74 @@ def categories_post(input: NewSupplier):
         raise HTTPException(status_code=404)
 
 
+# ZADANIE 4
+class UpdateSupplier(BaseModel):
+    CompanyName: str
+    ContactName: Optional[str] = None
+    ContactTitle: Optional[str] = None
+    Address: Optional[str] = None
+    City: Optional[str] = None
+    PostalCode: Optional[str] = None
+    Country: Optional[str] = None
+    Phone: Optional[str] = None
+    Fax: Optional[str] = None
+    HomePage: Optional[str] = None
+
+
+@app.put("/suppliers/{id}")
+def suppliers_put(id: int, input: UpdateSupplier):
+    try:
+        connection = sqlite3.connect("northwind.db")
+        connection.text_factory = lambda b: b.decode(encoding='latin1')
+
+        df = pd.read_sql_query(
+            "SELECT SupplierID "
+            "FROM Suppliers "
+            "WHERE SupplierID = ?",
+            connection,
+            params=[id])
+
+        if df.empty:
+            raise HTTPException(status_code=404)
+
+        inp = input.dict()
+        tab_params = []
+        sql = "UPDATE Suppliers SET "
+
+        for k in inp.keys():
+            if inp[k] is not None:
+                tab_params.append(inp[k])
+                sql += " " + k + " = ?,"
+
+        sql = sql[:-1]
+        sql += " WHERE SupplierID = ?"
+
+        cursor = connection.cursor()
+        cursor.execute(sql,
+                       tab_params + [id])
+        connection.commit()
+
+        df = pd.read_sql_query(
+            "SELECT SupplierID, CompanyName, ContactName, ContactTitle, Address, City, PostalCode, Country, Phone, Fax, HomePage "
+            "FROM Suppliers "
+            "WHERE SupplierID = ?",
+            connection,
+            params=[id])
+
+        if df.empty:
+            raise HTTPException(status_code=404)
+
+        df = df.to_dict('records')[0]
+
+        connection.close()
+
+        return JSONResponse(
+            content=df,
+            status_code=200)
+
+    except Exception as e:
+        raise HTTPException(status_code=404)
+
+
 if __name__ == "__main__":
     uvicorn.run("main:app")
