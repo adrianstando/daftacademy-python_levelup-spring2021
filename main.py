@@ -761,5 +761,47 @@ def suppliers_put(id: int, input: UpdateSupplier):
         raise HTTPException(status_code=404)
 
 
+# ZADANIE 5
+@app.delete("/suppliers/{id}")
+def suppliers_delete(id: int, response: Response):
+    try:
+        connection = sqlite3.connect("northwind.db")
+        connection.text_factory = lambda b: b.decode(encoding='latin1')
+
+        df = pd.read_sql_query(
+            "SELECT SupplierID "
+            "FROM Suppliers "
+            "WHERE SupplierID = ?",
+            connection,
+            params=[id])
+
+        if df.empty:
+            raise HTTPException(status_code=404)
+
+        cursor = connection.cursor()
+        cursor.execute("DELETE FROM Suppliers"
+                       "WHERE SupplierID = ?",
+                       [id])
+        connection.commit()
+
+        df = pd.read_sql_query(
+            "SELECT SupplierID "
+            "FROM Suppliers "
+            "WHERE SupplierID = ?",
+            connection,
+            params=[id])
+
+        if not df.empty:
+            raise HTTPException(status_code=404)
+
+        connection.close()
+
+        response.status_code = 204
+        return response
+
+    except Exception as e:
+        raise HTTPException(status_code=404)
+
+
 if __name__ == "__main__":
     uvicorn.run("main:app")
