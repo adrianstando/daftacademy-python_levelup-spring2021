@@ -693,7 +693,7 @@ def categories_post(input: NewSupplier):
 
 # ZADANIE 4
 class UpdateSupplier(BaseModel):
-    CompanyName: str
+    CompanyName: Optional[str] = None
     ContactName: Optional[str] = None
     ContactTitle: Optional[str] = None
     Address: Optional[str] = None
@@ -733,9 +733,10 @@ def suppliers_put(id: int, input: UpdateSupplier):
         sql = sql[:-1]
         sql += " WHERE SupplierID = ?"
 
-        cursor = connection.cursor()
-        cursor.execute(sql,
-                       tab_params + [id])
+        if not len(tab_params) == 0:
+            cursor = connection.cursor()
+            cursor.execute(sql,
+                           tab_params + [id])
 
         df = pd.read_sql_query(
             "SELECT SupplierID, CompanyName, ContactName, ContactTitle, Address, City, PostalCode, Country, Phone, Fax, HomePage "
